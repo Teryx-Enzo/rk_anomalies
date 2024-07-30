@@ -1,7 +1,3 @@
-const { dialog } = require('electron').remote;
-const path = require('path');
-
-
 
 document.getElementById('startPythonButton').addEventListener('click', () => {
     const imageType = document.getElementById('imageType').value;
@@ -13,47 +9,24 @@ document.getElementById('startPythonButton').addEventListener('click', () => {
         .catch(error => console.error('Erreur:', error));
 });
 
-document.getElementById('selectSourceDirButton').addEventListener('click', () => {
-    dialog.showOpenDialog({ properties: ['openDirectory'] }).then(result => {
-        if (!result.canceled) {
-            const sourceDirPath = result.filePaths[0];
-            document.getElementById('sourceDir').value = sourceDirPath;
-        }
-    }).catch(err => {
-        console.log(err);
-    });
-});
 
-document.getElementById('selectDestDirButton').addEventListener('click', () => {
-    dialog.showOpenDialog({ properties: ['openDirectory'] }).then(result => {
-        if (!result.canceled) {
-            const destDirPath = result.filePaths[0];
-            document.getElementById('destDir').value = destDirPath;
-        }
-    }).catch(err => {
-        console.log(err);
-    });
-});
 
 document.getElementById('simulateButton').addEventListener('click', () => {
-    const sourceDirInput = document.getElementById('sourceDir');
-    const destDirInput = document.getElementById('destDir');
+    const sourceDir = 'C:/Users/Enzo/Pictures/dataset/test_ds_30';
+    const destDir = 'C:/Users/Enzo/Pictures/dataset';
     
     //  const destDir = 'C:/Users/Enzo/Pictures/dataset' // Spécifiez le dossier source ici
     //const sourceDir = 'C:/Users/Enzo/Pictures/Images_triees_2/nouveaux_defauts'; // Spécifiez le dossier de destination ici
-    if (sourceDirInput.files.length > 0 && destDirInput.files.length > 0) {
-        const sourceDir = sourceDirInput.files[0].webkitRelativePath.split('/')[0];
-        const destDir = destDirInput.files[0].webkitRelativePath.split('/')[0];
+    
+        
 
-        fetch(`/simulate?source_dir=${sourceDir}&dest_dir=${destDir}`)
-            .then(response => response.text())
-            .then(data => {
-                console.log(data); // Log initial response
-            })
-            .catch(error => console.error('Erreur:', error));
-    } else {
-        alert('Veuillez sélectionner les deux dossiers.');
-    }
+    fetch(`/simulate?source_dir=${sourceDir}&dest_dir=${destDir}`)
+        .then(response => response.text())
+        .then(data => {
+            console.log(data); // Log initial response
+        })
+        .catch(error => console.error('Erreur:', error));
+    
 });
 
 // Configuration de WebSocket pour écouter les messages du serveur
