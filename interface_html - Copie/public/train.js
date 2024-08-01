@@ -15,12 +15,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
 document.getElementById('trainModelButton').addEventListener('click', () => {
     const modelName = document.getElementById('modelSelect').value;
+    const output = document.getElementById('trainOutput');
+    output.innerText = '';
 
     fetch(`/train-model?model_name=${encodeURIComponent(modelName)}`)
         .then(response => response.text())
         .then(data => {
-            const output = document.getElementById('trainOutput');
-            output.innerText = data;
+            console.log(data); // Log initial response
         })
         .catch(error => console.error('Erreur:', error));
+});
+
+// Configuration de WebSocket pour écouter les messages du serveur
+const socket = new WebSocket('ws://localhost:3000');
+
+socket.addEventListener('message', function (event) {
+    const output = document.getElementById('trainOutput');
+    output.innerText += `${event.data}\n`;
+    output.scrollTop = output.scrollHeight; // Scroll to the bottom
 });

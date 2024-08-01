@@ -117,7 +117,11 @@ app.get('/train-model', (req, res) => {
 
         trainProcess.stdout.on('data', (data) => {
             console.log(`stdout: ${data}`);
-            res.write(data.toString());
+            wss.clients.forEach(client => {
+                if (client.readyState === WebSocket.OPEN) {
+                    client.send(data.toString());
+                }
+            });
         });
 
         trainProcess.stderr.on('data', (data) => {
@@ -127,9 +131,9 @@ app.get('/train-model', (req, res) => {
         trainProcess.on('close', (code) => {
             console.log(`Processus d'entraînement terminé avec le code ${code}`);
             trainProcess = null;
-            res.end();
         });
 
+        res.send('Entraînement du modèle lancé');
     } else {
         res.send('L\'entraînement est déjà en cours');
     }

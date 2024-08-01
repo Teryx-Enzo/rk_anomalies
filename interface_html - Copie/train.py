@@ -6,6 +6,7 @@ from models import ResNet
 from utils import ToDeviceLoader, to_device, get_device, train, load_weights
 from pathlib import Path
 
+
 if __name__ == "__main__":
     print("Début de l'entraînement du modèle", flush=True)
 
