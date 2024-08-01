@@ -8,6 +8,7 @@ const app = express();
 const PORT = 3000;
 let pythonProcess = null;
 let simulateProcess = null;
+let trainProcess = null;
 
 app.use(express.static('public'));
 
@@ -103,5 +104,33 @@ app.get('/simulate', (req, res) => {
 
     } else {
         res.send('La simulation est déjà en cours');
+    }
+});
+
+
+app.get('/train-model', (req, res) => {
+    if (!trainProcess) {
+        const modelName = req.query.model_name || '';
+
+        trainProcess = spawn('C:/Users/Enzo/AppData/Local/Programs/Python/Python312/python.exe', 
+            ['train.py', '-model_name', modelName]);
+
+        trainProcess.stdout.on('data', (data) => {
+            console.log(`stdout: ${data}`);
+            res.write(data.toString());
+        });
+
+        trainProcess.stderr.on('data', (data) => {
+            console.error(`stderr: ${data}`);
+        });
+
+        trainProcess.on('close', (code) => {
+            console.log(`Processus d'entraînement terminé avec le code ${code}`);
+            trainProcess = null;
+            res.end();
+        });
+
+    } else {
+        res.send('L\'entraînement est déjà en cours');
     }
 });

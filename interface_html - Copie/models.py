@@ -29,7 +29,7 @@ class BaseModel(nn.Module):
     
     def epoch_end(self, epoch, result):
         print("Epoch [{}], last_lr: {:.5f}, train_loss: {:.4f}, val_loss: {:.4f}, val_acc: {:.4f}".format(
-            epoch, result['lrs'][-1], result['train_loss'], result['val_loss'], result['val_acc']))
+            epoch, result['lrs'][-1], result['train_loss'], result['val_loss'], result['val_acc']), flush = True)
         
 
 def conv_shortcut(in_channel, out_channel, stride):
