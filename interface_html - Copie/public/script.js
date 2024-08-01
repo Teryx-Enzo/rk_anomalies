@@ -1,7 +1,24 @@
+document.addEventListener('DOMContentLoaded', () => {
+    fetch('/get-models')
+        .then(response => response.json())
+        .then(models => {
+            const modelSelect = document.getElementById('modelSelect');
+            models.forEach(model => {
+                const option = document.createElement('option');
+                option.value = model;
+                option.text = model;
+                modelSelect.appendChild(option);
+            });
+        })
+        .catch(error => console.error('Erreur:', error));
+});
 
 document.getElementById('startPythonButton').addEventListener('click', () => {
     const imageType = document.getElementById('imageType').value;
-    fetch(`/start-python?image_type=${imageType}`)
+    const folderPath = document.getElementById('folderPath').value;
+    const modelName = document.getElementById('modelSelect').value;
+
+    fetch(`/start-python?image_type=${imageType}&folder_path=${encodeURIComponent(folderPath)}&model_name=${encodeURIComponent(modelName)}`)
         .then(response => response.text())
         .then(data => {
             console.log(data); // Log initial response
@@ -9,27 +26,18 @@ document.getElementById('startPythonButton').addEventListener('click', () => {
         .catch(error => console.error('Erreur:', error));
 });
 
-
-
 document.getElementById('simulateButton').addEventListener('click', () => {
     const sourceDir = 'C:/Users/Enzo/Pictures/dataset/test_ds_30';
     const destDir = 'C:/Users/Enzo/Pictures/dataset';
     
-    //  const destDir = 'C:/Users/Enzo/Pictures/dataset' // Spécifiez le dossier source ici
-    //const sourceDir = 'C:/Users/Enzo/Pictures/Images_triees_2/nouveaux_defauts'; // Spécifiez le dossier de destination ici
-    
-        
-
     fetch(`/simulate?source_dir=${sourceDir}&dest_dir=${destDir}`)
         .then(response => response.text())
         .then(data => {
             console.log(data); // Log initial response
         })
         .catch(error => console.error('Erreur:', error));
-    
 });
 
-// Configuration de WebSocket pour écouter les messages du serveur
 const socket = new WebSocket('ws://localhost:3000');
 
 socket.addEventListener('message', function (event) {
@@ -38,44 +46,35 @@ socket.addEventListener('message', function (event) {
     const statusIndicatorTime = document.getElementById('indicator_time');
     const timeOutput = document.getElementById('timeOutput');
 
-    // Parse the message from the server
     const message = event.data.split('\n').filter(line => line.trim() !== '');  
     if (message.length > 0) {
         if (message[0].startsWith('Temps')) {
-            // Extraire les temps d'exécution pour le graphique
             const times = message.map(line => parseFloat(line.split(': ')[1].replace(' ms', '')));
             updateChart(times);
         } else {
-            // Mise à jour de l'indicateur de statut et du temps
-            const status = message[0].split(';')[0]; // G or NG
-            const time = parseInt(message[0].split(';')[1]); // Time in ms
-    // Update the status indicator
-    if (status === 'G') {
-        statusIndicatorClass.classList.remove('red');
-        statusIndicatorClass.classList.add('green');
-    } else {
-        statusIndicatorClass.classList.remove('green');
-        statusIndicatorClass.classList.add('red');
-    }
+            const status = message[0].split(';')[0];
+            const time = parseInt(message[0].split(';')[1]);
+
+            if (status === 'G') {
+                statusIndicatorClass.classList.remove('red');
+                statusIndicatorClass.classList.add('green');
+            } else {
+                statusIndicatorClass.classList.remove('green');
+                statusIndicatorClass.classList.add('red');
+            }
     
-    // Update the status indicator
-    if (time < 300) {
-        statusIndicatorTime.classList.remove('red');
-        statusIndicatorTime.classList.add('green');
-    } else {
-        statusIndicatorTime.classList.remove('green');
-        statusIndicatorTime.classList.add('red');
-    }   
-
-    // Update the time output
-    timeOutput.innerText = `Temps: ${time} ms`;
-
-    // Update the output log
-    output.innerText += `${event.data}\n`;
+            if (time < 300) {
+                statusIndicatorTime.classList.remove('red');
+                statusIndicatorTime.classList.add('green');
+            } else {
+                statusIndicatorTime.classList.remove('green');
+                statusIndicatorTime.classList.add('red');
+            }   
+    
+            timeOutput.innerText = `Temps: ${time} ms`;
+            output.innerText += `${event.data}\n`;
         }   
-
     }
-
 });
 
 function updateChart(times) {

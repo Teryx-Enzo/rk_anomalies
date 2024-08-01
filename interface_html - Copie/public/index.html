@@ -9,8 +9,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.2"></script>
 </head>
 <body>
-    
-    
     <div class="container">
         <select id="imageType">
             <option value=".jpeg">.jpeg</option>
@@ -18,19 +16,21 @@
             <option value=".png">.png</option>
             <option value=".bmp">.bmp</option>
         </select>
+        <input type="text" id="folderPath" placeholder="Chemin du dossier" value = "C:\Users\Enzo\Pictures\dataset">
+        <select id="modelSelect">
+            <!-- Les options seront remplies dynamiquement -->
+        </select>
         <button id="startPythonButton">Lancer le Script Python</button>
-        
         <button id="simulateButton">Lancer la Simulation</button>
         <div id="status">
             <div id="indicator_class" class="red">
-                <span>Defaut</span>
+                <span>Défaut</span>
             </div>
             <div id="indicator_time" class="red">
                 <span>Temps</span>
             </div>
             <p id="timeOutput">Temps: 0 ms</p>
         </div>
-        
         <div id="result">
             <pre id="pythonOutput"></pre>
         </div>

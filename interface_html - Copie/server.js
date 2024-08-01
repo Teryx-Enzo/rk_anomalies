@@ -25,11 +25,27 @@ wss.on('connection', (ws) => {
     });
 });
 
+app.get('/get-models', (req, res) => {
+    const modelsDir = 'C:/Users/Enzo/Documents/Code_enzo/resnet18_test_/'; // Remplacez par le chemin réel de votre dossier de modèles
+    fs.readdir(modelsDir, (err, files) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send('Erreur lors de la lecture du dossier de modèles');
+        } else {
+            const modelFiles = files.filter(file => file.endsWith('.pth'));
+            res.json(modelFiles);
+        }
+    });
+});
+
 app.get('/start-python', (req, res) => {
     if (!pythonProcess) {
-        const imageType = req.query.image_type || 'png'; // Par défaut à 'png' si aucun type n'est spécifié
-        // Spécifiez le chemin vers l'interpréteur Python de votre environnement virtuel
-        pythonProcess = spawn('C:/Users/Enzo/AppData/Local/Programs/Python/Python312/python.exe', ['script.py' ,'-image_type',imageType]);
+        const imageType = req.query.image_type || 'png';
+        const folderPath = req.query.folder_path || '';
+        const modelName = req.query.model_name || '';
+
+        pythonProcess = spawn('C:/Users/Enzo/AppData/Local/Programs/Python/Python312/python.exe', 
+            ['script.py', '-image_type', imageType, '-folder_path', folderPath, '-model_name', modelName]);
 
         pythonProcess.stdout.on('data', (data) => {
             console.log(`stdout: ${data}`);
@@ -55,20 +71,17 @@ app.get('/start-python', (req, res) => {
     }
 });
 
-
-
 app.get('/simulate', (req, res) => {
     if (!simulateProcess) {
         const sourceDir = req.query.source_dir || 'source_images';
         const destDir = req.query.dest_dir || 'images';
-        const pythonInterpreter = 'C:/Users/Enzo/AppData/Local/Programs/Python/Python312/python.exe'; // Sur Windows : 'venv\\Scripts\\python.exe'
-        console.log(`commande : ${sourceDir}`)
+        const pythonInterpreter = 'C:/Users/Enzo/AppData/Local/Programs/Python/Python312/python.exe';
+        
         simulateProcess = spawn(pythonInterpreter, ['simulate.py', '-source_dir', sourceDir, '-dest_dir', destDir]);
 
         let output = '';
 
         simulateProcess.stdout.on('data', (data) => {
-            
             output += data.toString();
         });
 
@@ -79,7 +92,6 @@ app.get('/simulate', (req, res) => {
         simulateProcess.on('close', (code) => {
             console.log(`Simulation terminée avec le code ${code}`);
             simulateProcess = null;
-            // Envoyer les temps d'exécution au client
             wss.clients.forEach(client => {
                 if (client.readyState === WebSocket.OPEN) {
                     console.log(`stdout: ${output}`);
