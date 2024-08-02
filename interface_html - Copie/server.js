@@ -111,9 +111,10 @@ app.get('/simulate', (req, res) => {
 app.get('/train-model', (req, res) => {
     if (!trainProcess) {
         const modelName = req.query.model_name || '';
+        const dataPath = req.query.data_path || '';
 
         trainProcess = spawn('C:/Users/Enzo/AppData/Local/Programs/Python/Python312/python.exe', 
-            ['train.py', '-model_name', modelName]);
+            ['train.py', '-model_name', modelName, '-data_path', dataPath]);
 
         trainProcess.stdout.on('data', (data) => {
             console.log(`stdout: ${data}`);

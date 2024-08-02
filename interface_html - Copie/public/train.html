@@ -9,12 +9,18 @@
 <body>
     <div class="container">
         <h1>Entraînement du Modèle</h1>
-        <select id="modelSelect">
-            <!-- Les options seront remplies dynamiquement -->
-        </select>
-        <button id="trainModelButton">Lancer l'Entraînement</button>
-        <div id="trainOutput"></div>
-        <a href="/">Retour à la page principale</a>
+        
+        <label for="dataPath">Chemin des données :</label>
+        <input type="text" id="dataPath" placeholder="Entrez le chemin des données", value = "C:\Users\Enzo\Pictures\dataset">
+        
+        <label for="modelSelect">Sélectionnez le modèle :</label>
+        <select id="modelSelect"></select>
+        
+        <button id="trainModelButton">Lancer l'entraînement</button>
+        
+        <div id="result">
+            <pre id="trainOutput"></pre>
+        </div>
     </div>
     <script src="train.js"></script>
 </body>

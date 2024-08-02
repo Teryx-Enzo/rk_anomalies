@@ -15,10 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 document.getElementById('trainModelButton').addEventListener('click', () => {
     const modelName = document.getElementById('modelSelect').value;
+    const dataPath = document.getElementById('dataPath').value;
     const output = document.getElementById('trainOutput');
     output.innerText = '';
 
-    fetch(`/train-model?model_name=${encodeURIComponent(modelName)}`)
+    fetch(`/train-model?model_name=${encodeURIComponent(modelName)}&data_path=${encodeURIComponent(dataPath)}`)
         .then(response => response.text())
         .then(data => {
             console.log(data); // Log initial response

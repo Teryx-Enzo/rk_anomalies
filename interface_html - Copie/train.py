@@ -7,17 +7,18 @@ from utils import ToDeviceLoader, to_device, get_device, train, load_weights
 from pathlib import Path
 
 
+
 if __name__ == "__main__":
     print("Début de l'entraînement du modèle", flush=True)
 
     parser = argparse.ArgumentParser(description='Params of the script')
     parser.add_argument('-model_name', metavar='-m', type=str, help='name of the model file')
+    parser.add_argument('-data_path', metavar='-d', type=str, help='path to the data directory')
 
     args = parser.parse_args()
 
     model_name = args.model_name
-    data_path = r'C:\Users\Enzo\Pictures\dataset'
-    weight_path = Path(r"C:\Users\Enzo\Documents\Code_enzo\resnet18_test_") / model_name
+    data_path = args.data_path
     class_name = 'RK_fusion'
 
     epochs = 100
@@ -39,8 +40,12 @@ if __name__ == "__main__":
     test_dl = ToDeviceLoader(test_dl, device)
     
     model = ResNet(3, 2)
-    model  = to_device(model, device)
+    model = to_device(model, device)
+    
+    weight_path = Path(r"C:\Users\Enzo\Documents\Code_enzo\resnet18_test_") / model_name
+    load_weights(model, weight_path)
 
     print(f"Entraînement avec le modèle {model_name}", flush=True)
     train(model, epochs, train_dl, test_dl, optimizer, max_lr, grad_clip, weight_decay)
+
     print("Entraînement terminé", flush=True)
