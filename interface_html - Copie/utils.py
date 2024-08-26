@@ -8,6 +8,7 @@ from torchvision import transforms as T
 from pathlib import Path
 from io import BytesIO
 from server_http import update_value
+import csv
 
 
 def get_device():
@@ -108,6 +109,8 @@ def train(model_courant, epochs, train_dl, test_dl, optimizer, max_lr, grad_clip
                 optimizer=optimizer, max_lr=max_lr, grad_clip=grad_clip,
                 weight_decay=weight_decay, scheduler=torch.optim.lr_scheduler.OneCycleLR)
     
+
+    torch.save(model_courant.state_dict(), 'rk-resnet-project_new.pth')
     return history
 
 def load_pre_trained_weights(model, weights_path):
@@ -249,6 +252,24 @@ class Handler(FileSystemEventHandler):
             img_tensor = self.transform(merged_image)
             
             pred= predict_image(img_tensor, self.model, self.test_data_classes, self.device)
+
+            # Sauvegarder la prediction et le nom des images dans un csv
+
+            # Chemin du fichier CSV
+            filename = "output.csv"
+
+            data = self.image_paths[:3] + [pred]
+
+            print(data, flush = True)
+            for i in range(len(data)):
+
+                data[i] = str(data[i]).split("\\")[-1]
+                print(data[i], flush = True)
+            # Écriture dans le fichier CSV
+            with open(filename, mode='a', newline='', encoding='utf-8') as file:
+                writer = csv.writer(file, delimiter=';')
+                writer.writerow(data)
+
 
             # Retirer les trois premières images de la liste
             self.image_paths = self.image_paths[3:]

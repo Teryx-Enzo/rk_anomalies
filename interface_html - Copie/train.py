@@ -3,7 +3,7 @@ import torch
 from torch.utils.data import DataLoader
 from rk_dataset import RKDataset
 from models import ResNet
-from utils import ToDeviceLoader, to_device, get_device, train, load_weights
+from utils import ToDeviceLoader, to_device, get_device, train, load_weights, load_pre_trained_weights
 from pathlib import Path
 
 
@@ -43,7 +43,7 @@ if __name__ == "__main__":
     model = to_device(model, device)
     
     weight_path = Path(r"C:\Users\Enzo\Documents\Code_enzo\resnet18_test_") / model_name
-    load_weights(model, weight_path)
+    load_pre_trained_weights(model, weight_path)
 
     print(f"Entraînement avec le modèle {model_name}", flush=True)
     train(model, epochs, train_dl, test_dl, optimizer, max_lr, grad_clip, weight_decay)

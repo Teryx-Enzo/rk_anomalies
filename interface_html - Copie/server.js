@@ -139,3 +139,29 @@ app.get('/train-model', (req, res) => {
         res.send('L\'entraînement est déjà en cours');
     }
 });
+
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' }); // Dossier temporaire pour stocker les fichiers
+
+app.post('/compare-csv', upload.fields([{ name: 'file1' }, { name: 'file2' }]), (req, res) => {
+    const file1 = req.files['file1'][0].path;
+    const file2 = req.files['file2'][0].path;
+
+    const compareProcess = spawn('C:/Users/Enzo/AppData/Local/Programs/Python/Python312/python.exe', 
+        ['compare.py', '-file1', file1, '-file2', file2]);
+
+    let output = '';
+
+    compareProcess.stdout.on('data', (data) => {
+        output += data.toString();
+    });
+
+    compareProcess.stderr.on('data', (data) => {
+        console.error(`stderr: ${data}`);
+    });
+
+    compareProcess.on('close', (code) => {
+        console.log(`Comparaison terminée avec le code ${code}`);
+        res.send(output);
+    });
+});

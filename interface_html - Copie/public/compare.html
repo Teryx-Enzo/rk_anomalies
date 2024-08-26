@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparer deux CSV</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Comparer deux CSV</h1>
+        
+        <label for="csvFile1">Sélectionnez le premier fichier CSV :</label>
+        <input type="file" id="csvFile1" accept=".csv">
+        
+        <label for="csvFile2">Sélectionnez le deuxième fichier CSV :</label>
+        <input type="file" id="csvFile2" accept=".csv">
+        
+        <button id="compareButton">Lancer la comparaison</button>
+        
+        <div id="result">
+            <pre id="compareOutput"></pre>
+        </div>
+    </div>
+    <script src="compare.js"></script>
+</body>
+</html>
