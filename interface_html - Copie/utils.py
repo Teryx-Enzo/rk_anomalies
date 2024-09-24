@@ -123,7 +123,8 @@ def load_pre_trained_weights(model, weights_path):
     pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict and k not in ['classifier.2.weight', 'classifier.2.bias']}
 
     for k, v in model_dict.items():
-        if k in  ['classifier.2.weight', 'classifier.2.bias']:
+        print(k)
+        if k in  ['classifier.2.weight', 'classifier.2.bias', "classifier.1.weight", "classifier.1.bias"]:
             pretrained_dict[k] = v
     # 2. overwrite entries in the existing state dict
     model_dict.update(pretrained_dict) 
@@ -192,10 +193,9 @@ class Handler(FileSystemEventHandler):
         self.suffixes = ["&Cam1Img.GlossRatio{imagetype}".format(imagetype=self.image_type),"&Cam1Img.Normal{imagetype}".format(imagetype=self.image_type),"&Cam1Img.Shape1{imagetype}".format(imagetype=self.image_type)]
 
         self.transform = T.Compose([
-                T.Resize(48, Image.LANCZOS),
-                T.CenterCrop(48),
-                T.ToTensor(),
-                T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        T.Resize((256, 256)),
+        T.ToTensor(),
+        T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
             ])
 
     def process(self, event):
@@ -206,7 +206,12 @@ class Handler(FileSystemEventHandler):
             pred = self.process_images()
             
             if pred or pred==0 : 
-                update_value(pred)
+
+                try :
+                    update_value(pred)
+                except Exception as e:
+                    pass
+                
                 status= self.test_data_classes[pred]
                 elapsed_time = int((time.time()-self.t0)*1000)
                 self.t0 = 0
@@ -260,11 +265,10 @@ class Handler(FileSystemEventHandler):
 
             data = self.image_paths[:3] + [pred]
 
-            print(data, flush = True)
+            #print(data, flush = True)
             for i in range(len(data)):
 
                 data[i] = str(data[i]).split("\\")[-1]
-                print(data[i], flush = True)
             # Écriture dans le fichier CSV
             with open(filename, mode='a', newline='', encoding='utf-8') as file:
                 writer = csv.writer(file, delimiter=';')
