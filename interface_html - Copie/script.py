@@ -2,12 +2,12 @@ import argparse
 import torch
 from PIL import Image
 from pathlib import Path
-from torchvision import transforms as T
+from torchvision import transforms
 from torch.utils.data.dataloader import DataLoader
 from rk_dataset import RKDataset
 
 from utils import ToDeviceLoader, to_device, get_device, accuracy, train, load_pre_trained_weights, load_weights, Watcher, get_classes_items, predict_image
-from models import ResNet
+from models import ResNetWithGradCAM
 
 if __name__ == "__main__":
     print("Script python lancé", flush=True)
@@ -48,18 +48,17 @@ if __name__ == "__main__":
     train_dl = ToDeviceLoader(train_dl, device)
     test_dl = ToDeviceLoader(test_dl, device)
 
-    model = ResNet(3, 2)
+    model = ResNetWithGradCAM(3, 2)
     model = to_device(model, device)
     
     load_weights(model, weight_path)
-    warm_up_path = r"C:\Users\Enzo\Pictures\image.png"
+    warm_up_path = r"C:\Users\Enzo\Pictures\image.jpg"
 
     with Image.open(Path(warm_up_path)).convert('RGB') as img:
-        transform_x = T.Compose([T.Resize(48, Image.LANCZOS),
-                                 T.CenterCrop(48),
-                                 T.ToTensor(),
-                                 T.Normalize(mean=[0.485, 0.456, 0.406],
-                                             std=[0.229, 0.224, 0.225])])
+        transform_x = transforms.Compose([ transforms.Resize((256, 256)),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    ])
         img = transform_x(img)
         predict_image(img, model, test_data_classes, device)
 
